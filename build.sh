@@ -1,19 +1,19 @@
 #!/bin/bash
 
 function clean() {
-	./mvnw clean "$@"
+	./gradlew clean "$@"
 }
 
 function package() {
-	./mvnw clean package -T 5 "$@"
+	./gradlew clean build "$@"
 }
 
-function bootrun() {
-	./mvnw clean package spring-boot:run -T 5 "$@"
+function debug() {
+	package && java -Xdebug -Xrunjdwp:transport=dt_socket,address=5010,server=y,suspend=n -jar build/libs/casbootadminserver.war 
 }
 
 function run() {
-	package && java -Xdebug -Xrunjdwp:transport=dt_socket,address=5010,server=y,suspend=n -jar target/casbootadminserver.war 
+	package && java -jar build/libs/casbootadminserver.war
 }
 
 if [ $# -eq 0 ]; then
@@ -27,14 +27,10 @@ case "$1" in
 "clean")
 	shift
     clean "$@"
-    ;;   
+    ;;
 "package")
 	shift
     package "$@"
-    ;;
-"bootrun")
-	shift
-    bootrun "$@"
     ;;
 "run")
     run "$@"
