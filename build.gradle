@@ -84,8 +84,3 @@ bootRun {
 dependencies {
     compile "org.apereo.cas:cas-server-webapp-bootadmin-server:${project.casVersion}"
 }
-
-
-task wrapper(type: Wrapper, description: "Update the Gradle wrapper") {
-    gradleVersion = "${project.gradleVersion}"
-}
