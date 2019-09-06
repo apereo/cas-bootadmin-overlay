@@ -17,7 +17,8 @@ pull_request_rules:
     - status-success=WIP
     - "#changes-requested-reviews-by=0"
     - base=master
-    - label=Dependencies & Modules
+    - label=bot
+    - label=dependencies
   actions:
     merge:
       method: squash
