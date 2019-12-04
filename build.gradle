@@ -5,9 +5,11 @@ buildscript {
         maven { url "https://repo.spring.io/milestone/" }
         maven { url "https://repo.spring.io/libs-milestone" }
         maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local" }
+        maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${project.springBootVersion}"
+        classpath "io.freefair.gradle:maven-plugin:${project.gradleMavenPluginVersion}"
     }
 }
 
@@ -24,8 +26,8 @@ repositories {
     maven { url "https://repo.spring.io/snapshot" }
 }
 
-apply from: "https://dl.bintray.com/scalding/generic/waroverlay.gradle"
 
+apply plugin: "io.freefair.war-overlay"
 apply plugin: "war"
 apply plugin: "org.springframework.boot"
 apply plugin: "eclipse"
@@ -56,11 +58,6 @@ idea {
     }
 }
 
-war {
-    includeWarJars = true
-    entryCompression = ZipEntryCompression.STORED
-}
-
 springBoot {
     mainClassName = "org.apereo.cas.CasSpringBootAdminServerWebApplication"
 }
@@ -69,11 +66,22 @@ bootWar {
 	if (project.hasProperty('executable')) {
     	launchScript()
 	}
-
+    entryCompression = ZipEntryCompression.STORED
 	archiveName 'casbootadminserver.war'
     baseName 'casbootadminserver'
 
     excludeDevtools = false
+    overlays {
+        // https://docs.freefair.io/gradle-plugins/current/reference/#_io_freefair_war_overlay
+        // Note: The "excludes" property is only for files in the war dependency.
+        // If a jar is excluded from the war, it could be brought back into the final war as a dependency
+        // of non-war dependencies. Those should be excluded via normal gradle dependency exclusions.
+        cas {
+            from "org.apereo.cas:cas-server-webapp-bootadmin-server:${project.casVersion}"
+            provided = false
+            //excludes = ["WEB-INF/lib/somejar-1.0*"]
+        }
+    }    
 }
 
 bootRun {
@@ -82,5 +90,5 @@ bootRun {
 }
 
 dependencies {
-    compile "org.apereo.cas:cas-server-webapp-bootadmin-server:${project.casVersion}"
+    // add extra dependencies here
 }
