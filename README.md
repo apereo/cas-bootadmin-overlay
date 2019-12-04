@@ -6,7 +6,7 @@ Generic CAS Spring Boot Admin Server WAR overlay.
 # Versions
 
 ```xml
-<cas.version>6.0.x</cas.version>
+<cas.version>6.1.x</cas.version>
 ```
 
 # Requirements
