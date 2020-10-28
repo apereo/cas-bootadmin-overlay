@@ -41,22 +41,6 @@ if (!currentVersion.contains("RC")) {
         currentBranch = matcher.group(1) + "x"
     }
 }
-logger.info "Using CAS branch [${currentBranch}] to handle overrides"
-apply from: "https://raw.githubusercontent.com/apereo/cas/${currentBranch}/gradle/overrides.gradle"
-
-eclipse {
-    classpath {
-       downloadSources = true
-       downloadJavadoc = true
-    }
-}
-
-idea {
-    module {
-        downloadJavadoc = true
-        downloadSources = true
-    }
-}
 
 springBoot {
     mainClassName = "org.apereo.cas.CasSpringBootAdminServerWebApplication"
