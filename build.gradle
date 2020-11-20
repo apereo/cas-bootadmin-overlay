@@ -46,6 +46,11 @@ springBoot {
     mainClassName = "org.apereo.cas.CasSpringBootAdminServerWebApplication"
 }
 
+bootBuildImage {
+    def tag = casVersion.endsWith("-SNAPSHOT") ? "latest" : "v${casVersion}"
+    imageName = "apereo/cas-bootadmin-server:${tag}"
+}
+
 bootWar {
 	if (project.hasProperty('executable')) {
     	launchScript()
