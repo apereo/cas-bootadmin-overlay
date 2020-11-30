@@ -10,6 +10,7 @@ buildscript {
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${project.springBootVersion}"
         classpath "io.freefair.gradle:maven-plugin:${project.gradleMavenPluginVersion}"
+        classpath "gradle.plugin.com.google.cloud.tools:jib-gradle-plugin:${project.jibVersion}"
     }
 }
 
@@ -35,6 +36,7 @@ apply plugin: "idea"
 
 def currentBranch = "master"
 def currentVersion = "$System.env.casVersion"
+def casServerVersion = project.casVersion
 if (!currentVersion.contains("RC")) {
     def matcher = currentVersion =~ /(\d+\.\d+\.).+/
     if (matcher.find()) {
@@ -80,4 +82,54 @@ bootRun {
 
 dependencies {
     // add extra dependencies here
+}
+
+apply plugin: "com.google.cloud.tools.jib"
+
+jib {
+    from {
+        image = project.baseDockerImage
+    }
+    to {
+        image = "${project.imageorg}/${project.imagerepo}"
+        /**
+         ecr-login: Amazon Elastic Container Registry (ECR)
+         gcr: Google Container Registry (GCR)
+         osxkeychain: Docker Hub
+         */
+        credHelper = "osxkeychain"
+        /**
+         auth {
+         username = "*******"
+         password = "*******"
+         }
+         */
+        tags = ["v" + casServerVersion]
+    }
+    container {
+        creationTime = "USE_CURRENT_TIMESTAMP"
+        entrypoint = ['/docker/entrypoint.sh']
+        ports = ['80', '443', '8080', '8443']
+        labels = [version:casServerVersion, name:project.imagerepo, group:project.group, org:project.imageorg]
+        workingDirectory = '/docker/cas/war'
+    }
+    extraDirectories {
+        paths {
+            path {
+                from = file('src/main/jib')
+            }
+            path {
+                from = file('etc/cas')
+                into = '/etc/cas'
+            }
+            path {
+                from = file("build/libs")
+                into = "/docker/cas/war"
+            }
+        }
+        permissions = [
+                '/docker/entrypoint.sh': '755'
+        ]
+    }
+    allowInsecureRegistries = project.allowInsecureRegistries
 }
