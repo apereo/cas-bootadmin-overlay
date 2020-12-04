@@ -81,7 +81,8 @@ bootRun {
 }
 
 dependencies {
-    // add extra dependencies here
+    implementation "org.apereo.cas:cas-server-webapp-init-bootadmin-server:${project.casVersion}"
+    implementation "org.apereo.cas:cas-server-webapp-bootadmin-server:${project.casVersion}"
 }
 
 apply plugin: "com.google.cloud.tools.jib"
